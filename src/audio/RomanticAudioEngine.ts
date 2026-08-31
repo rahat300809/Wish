@@ -157,6 +157,66 @@ class RomanticAudioEngine {
       osc.stop(t + 0.3);
     });
   }
+
+  // Play "Happy Birthday to You" celebratory musical chimes
+  public playHappyBirthdayMelody() {
+    this.initContext();
+    if (!this.ctx || !this.masterGain || this.isMuted) return;
+
+    // (freq, duration in seconds)
+    const melody: Array<{ note: number; dur: number; gap: number }> = [
+      { note: 392.00, dur: 0.35, gap: 0.4 }, // Hap-
+      { note: 392.00, dur: 0.2, gap: 0.25 }, // py
+      { note: 440.00, dur: 0.5, gap: 0.55 }, // Birth-
+      { note: 392.00, dur: 0.5, gap: 0.55 }, // day
+      { note: 523.25, dur: 0.5, gap: 0.55 }, // to
+      { note: 493.88, dur: 0.8, gap: 0.9 },  // you!
+      
+      { note: 392.00, dur: 0.35, gap: 0.4 }, // Hap-
+      { note: 392.00, dur: 0.2, gap: 0.25 }, // py
+      { note: 440.00, dur: 0.5, gap: 0.55 }, // Birth-
+      { note: 392.00, dur: 0.5, gap: 0.55 }, // day
+      { note: 587.33, dur: 0.5, gap: 0.55 }, // to
+      { note: 523.25, dur: 0.8, gap: 0.9 },  // you!
+
+      { note: 392.00, dur: 0.35, gap: 0.4 }, // Hap-
+      { note: 392.00, dur: 0.2, gap: 0.25 }, // py
+      { note: 783.99, dur: 0.5, gap: 0.55 }, // Birth-
+      { note: 659.25, dur: 0.5, gap: 0.55 }, // day
+      { note: 523.25, dur: 0.5, gap: 0.55 }, // dear
+      { note: 493.88, dur: 0.5, gap: 0.55 }, // Je-
+      { note: 440.00, dur: 0.8, gap: 0.9 },  // mi!
+
+      { note: 698.46, dur: 0.35, gap: 0.4 }, // Hap-
+      { note: 698.46, dur: 0.2, gap: 0.25 }, // py
+      { note: 659.25, dur: 0.5, gap: 0.55 }, // Birth-
+      { note: 523.25, dur: 0.5, gap: 0.55 }, // day
+      { note: 587.33, dur: 0.5, gap: 0.55 }, // to
+      { note: 523.25, dur: 1.2, gap: 1.3 },  // you!
+    ];
+
+    let currentOffset = 0;
+    melody.forEach((item) => {
+      const now = this.ctx!.currentTime + currentOffset;
+      const osc = this.ctx!.createOscillator();
+      const gain = this.ctx!.createGain();
+
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(item.note, now);
+
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.linearRampToValueAtTime(0.25, now + 0.04);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + item.dur);
+
+      osc.connect(gain);
+      gain.connect(this.masterGain!);
+
+      osc.start(now);
+      osc.stop(now + item.dur + 0.05);
+
+      currentOffset += item.gap;
+    });
+  }
 }
 
 export const audioEngine = new RomanticAudioEngine();

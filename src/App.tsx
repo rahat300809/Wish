@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { TabScene, RomanticTheme } from './types';
 import { HeaderNavigation } from './components/HeaderNavigation';
 import { GrandRevealHero } from './components/GrandRevealHero';
+import { BirthdayCakeCelebration } from './components/BirthdayCakeCelebration';
 import { RoseWishSanctuary } from './components/RoseWishSanctuary';
 import { LoveLetterSanctuary } from './components/LoveLetterSanctuary';
 import { ReasonsWhyJar } from './components/ReasonsWhyJar';
@@ -55,6 +56,10 @@ export default function App() {
             theme={currentTheme}
             onNavigate={setCurrentTab}
           />
+        )}
+
+        {currentTab === 'cake' && (
+          <BirthdayCakeCelebration />
         )}
 
         {currentTab === 'rose' && (

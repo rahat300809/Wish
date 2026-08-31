@@ -9,7 +9,9 @@ import {
   Volume2, 
   VolumeX, 
   Palette, 
-  Image as ImageIcon 
+  Image as ImageIcon,
+  Cake,
+  PartyPopper
 } from 'lucide-react';
 import { audioEngine } from '../audio/RomanticAudioEngine';
 import { launchGrandFireworks, launchRoseShower } from '../utils/celebrationEffects';
@@ -41,9 +43,10 @@ export const HeaderNavigation: React.FC<HeaderNavigationProps> = ({
   };
 
   const navItems: Array<{ id: TabScene; label: string; icon: React.ReactNode }> = [
-    { id: 'universe', label: '3D Celestial Heart', icon: <Sparkles className="w-4 h-4" /> },
-    { id: 'rose', label: 'Rose for Jemi 🌹', icon: <Flower2 className="w-4 h-4 text-[#a65341]" /> },
-    { id: 'letter', label: 'Love Letter', icon: <BookHeart className="w-4 h-4" /> },
+    { id: 'universe', label: 'Birthday Tribute ✨', icon: <PartyPopper className="w-4 h-4 text-amber-500" /> },
+    { id: 'cake', label: 'Cake Cutting 🎂', icon: <Cake className="w-4 h-4 text-[#a65341]" /> },
+    { id: 'rose', label: 'Rose Sanctuary 🌹', icon: <Flower2 className="w-4 h-4 text-[#a65341]" /> },
+    { id: 'letter', label: 'Birthday Letter', icon: <BookHeart className="w-4 h-4" /> },
     { id: 'reasons', label: 'Why I Love You', icon: <Heart className="w-4 h-4" /> },
     { id: 'timeline', label: 'Sacred Memories', icon: <Heart className="w-4 h-4 text-[#a65341]" /> },
     { id: 'surprise', label: 'Surprise Gift', icon: <Gift className="w-4 h-4" /> },

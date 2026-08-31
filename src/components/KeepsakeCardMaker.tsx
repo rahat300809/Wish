@@ -1,7 +1,8 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Heart, Sparkles, Download, Image as ImageIcon, Check } from 'lucide-react';
 import { audioEngine } from '../audio/RomanticAudioEngine';
 import { launchRoseShower, launchGrandFireworks } from '../utils/celebrationEffects';
+import { getSavedCouplePhoto, saveCouplePhoto } from '../utils/photoStorage';
 
 export const KeepsakeCardMaker: React.FC = () => {
   const [recipient, setRecipient] = useState('Jubaida Haque Jemi');
@@ -17,13 +18,32 @@ export const KeepsakeCardMaker: React.FC = () => {
 
   const cardRef = useRef<HTMLDivElement>(null);
 
+  useEffect(() => {
+    const saved = getSavedCouplePhoto();
+    if (saved) {
+      setPhotoUrl(saved);
+    }
+
+    const handlePhotoUpdated = () => {
+      setPhotoUrl(getSavedCouplePhoto());
+    };
+
+    window.addEventListener('couple_photo_updated', handlePhotoUpdated);
+    return () => {
+      window.removeEventListener('couple_photo_updated', handlePhotoUpdated);
+    };
+  }, []);
+
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
       reader.onload = () => {
-        setPhotoUrl(reader.result as string);
+        const result = reader.result as string;
+        setPhotoUrl(result);
+        saveCouplePhoto(result);
         audioEngine.playChime(1.3);
+        launchRoseShower();
       };
       reader.readAsDataURL(file);
     }
@@ -161,7 +181,7 @@ export const KeepsakeCardMaker: React.FC = () => {
             <label className="text-xs text-[#6d5a54] font-medium block mb-1">Add Cherished Photo</label>
             <label className="cursor-pointer flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-[#fffaf8] border border-[#d8c5bc] hover:border-[#a65341] text-xs text-[#4a3a35] font-medium transition-colors">
               <ImageIcon className="w-4 h-4 text-[#a65341]" />
-              <span>{photoUrl ? 'Replace Photo' : 'Upload Couple Photo'}</span>
+              <span>{photoUrl ? 'Change / Replace Photo' : 'Upload Our Photo'}</span>
               <input
                 type="file"
                 accept="image/*"
@@ -218,10 +238,10 @@ export const KeepsakeCardMaker: React.FC = () => {
 
             {/* Photo Inset (if present) */}
             {photoUrl && (
-              <div className="relative z-10 w-36 h-36 mx-auto rounded-2xl overflow-hidden border-2 border-[#a65341]/60 shadow-md mb-6">
+              <div className="relative z-10 w-44 h-52 mx-auto rounded-2xl overflow-hidden border-2 border-[#a65341]/60 shadow-xl mb-6 bg-neutral-100">
                 <img
                   src={photoUrl}
-                  alt="Keepsake Photo"
+                  alt="Rahat and Jemi Keepsake"
                   referrerPolicy="no-referrer"
                   className="w-full h-full object-cover"
                 />
@@ -233,7 +253,7 @@ export const KeepsakeCardMaker: React.FC = () => {
               <span className="text-xs uppercase tracking-[0.25em] block font-sans-clean font-semibold opacity-75">
                 To My Darling Wife
               </span>
-              <h2 className="font-cursive text-3xl sm:text-5xl text-[#a65341] font-normal mt-1">
+              <h2 className="font-serif-luxury text-3xl sm:text-5xl text-[#a65341] font-bold mt-1">
                 {recipient}
               </h2>
             </div>
@@ -249,7 +269,7 @@ export const KeepsakeCardMaker: React.FC = () => {
             <div className="relative z-10 mt-8 pt-4 border-t border-current opacity-80 flex items-center justify-between">
               <div>
                 <span className="text-[10px] uppercase tracking-[0.2em] font-sans-clean block opacity-70">With All My Soul</span>
-                <span className="font-cursive text-2xl sm:text-3xl text-[#a65341]">{sender} ♥</span>
+                <span className="font-serif-luxury italic text-2xl sm:text-3xl font-bold text-[#a65341]">{sender} ♥</span>
               </div>
 
               <div className="text-right">

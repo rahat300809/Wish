@@ -1,4 +1,4 @@
-export type TabScene = 'universe' | 'rose' | 'letter' | 'reasons' | 'timeline' | 'surprise' | 'keepsake';
+export type TabScene = 'universe' | 'cake' | 'rose' | 'letter' | 'reasons' | 'timeline' | 'surprise' | 'keepsake';
 
 export type RomanticTheme = 'natural-linen' | 'terracotta-clay' | 'rose-blush' | 'sage-earth';
 

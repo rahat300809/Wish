@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { TabScene, RomanticTheme } from '../types';
-import { ThreeGalaxyScene } from './ThreeGalaxyScene';
-import { Heart, Sparkles, Gift, BookHeart, Flame, ArrowRight, Flower2 } from 'lucide-react';
+import { Sparkles, Gift, BookHeart, Flame, ArrowRight, Flower2, Cake, Crown, PartyPopper, Heart, Music } from 'lucide-react';
 import { audioEngine } from '../audio/RomanticAudioEngine';
 import { launchGrandFireworks, launchRoseShower } from '../utils/celebrationEffects';
+import { getSavedCouplePhoto } from '../utils/photoStorage';
 
 interface GrandRevealHeroProps {
   theme: RomanticTheme;
@@ -11,85 +11,91 @@ interface GrandRevealHeroProps {
 }
 
 export const GrandRevealHero: React.FC<GrandRevealHeroProps> = ({
-  theme,
   onNavigate,
 }) => {
-  const [pulseCount, setPulseCount] = useState(0);
   const [lastClickedQuote, setLastClickedQuote] = useState(0);
+  const [photoUrl, setPhotoUrl] = useState<string | null>(null);
 
-  const loveAffirmations = [
-    '"You are the light of my universe, Jemi."',
-    '"Every beat of my heart whispers your sweet name."',
-    '"With you, forever will never be long enough."',
-    '"You are my greatest answered prayer, my queen."',
-    '"Rahat loves Jubaida beyond the ends of time."',
+  useEffect(() => {
+    setPhotoUrl(getSavedCouplePhoto());
+    const handlePhotoUpdated = () => setPhotoUrl(getSavedCouplePhoto());
+    window.addEventListener('couple_photo_updated', handlePhotoUpdated);
+    return () => window.removeEventListener('couple_photo_updated', handlePhotoUpdated);
+  }, []);
+
+  const birthdayAffirmations = [
+    '"Happy Birthday to my greatest blessing and eternal companion, Jemi."',
+    '"Every year with you is a gift I thank Allah for every single day."',
+    '"You make this world softer, warmer, and endlessly beautiful."',
+    '"May your new year be showered with boundless joy, peace, and health."',
+    '"Rahat loves Jubaida Haque Jemi beyond words and time."',
   ];
 
-  const handleHeartbeatClick = () => {
-    audioEngine.playHeartbeat();
-    setPulseCount((prev) => prev + 1);
-    setLastClickedQuote((prev) => (prev + 1) % loveAffirmations.length);
-    if (pulseCount % 3 === 2) {
-      launchRoseShower();
-    }
+  const handleNextAffirmation = () => {
+    audioEngine.playChime(1.15);
+    setLastClickedQuote((prev) => (prev + 1) % birthdayAffirmations.length);
+    launchRoseShower();
+  };
+
+  const handleCakeShortcut = () => {
+    audioEngine.playChime(1.2);
+    launchGrandFireworks();
+    onNavigate('cake');
   };
 
   return (
     <div className="relative min-h-screen w-full flex flex-col items-center justify-between pt-24 pb-12 px-4 sm:px-6 overflow-hidden">
       
-      {/* 3D WebGL Three.js Particle Universe Background */}
-      <ThreeGalaxyScene
-        theme={theme}
-        onHeartClick={handleHeartbeatClick}
-        interactiveSpeed={1}
-      />
-
-      {/* Floating Ambient Glow Orbs */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[480px] h-[480px] bg-rose-600/15 blur-[120px] rounded-full pointer-events-none" />
-      <div className="absolute bottom-1/3 right-1/4 w-[360px] h-[360px] bg-amber-500/10 blur-[100px] rounded-full pointer-events-none" />
+      {/* Clean Aesthetic Ambient Warmth Backdrop (No distracting 3D spinning animations) */}
+      <div className="absolute top-12 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-gradient-to-b from-[#fceae5] via-[#f9e2db] to-transparent blur-[100px] rounded-full pointer-events-none opacity-80" />
+      <div className="absolute bottom-16 right-10 w-[350px] h-[350px] bg-[#f5e6de] blur-[90px] rounded-full pointer-events-none opacity-60" />
 
       {/* Top Banner / Salutation Badge */}
-      <div className="relative z-10 flex flex-col items-center text-center max-w-4xl mx-auto mt-2 sm:mt-4 pointer-events-none">
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/80 border border-[#4a3a35]/20 text-[#6d5a54] text-xs sm:text-sm font-medium tracking-wide shadow-sm backdrop-blur-md mb-3">
-          <Sparkles className="w-3.5 h-3.5 text-[#a65341]" />
-          <span className="uppercase tracking-[0.3em] font-sans-clean text-[11px] font-bold text-[#8e7d77]">Forever & Always &bull; 3D Tribute</span>
-          <Sparkles className="w-3.5 h-3.5 text-[#a65341]" />
+      <div className="relative z-10 flex flex-col items-center text-center max-w-4xl mx-auto mt-2 sm:mt-4">
+        
+        <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-white/95 border border-[#a65341]/30 text-[#a65341] text-xs sm:text-sm font-semibold tracking-wide shadow-sm backdrop-blur-md mb-4 animate-fadeIn">
+          <Crown className="w-4 h-4 text-[#d4af37]" />
+          <span className="uppercase tracking-[0.25em] font-sans-clean text-[11px] font-bold text-[#8e7d77]">
+            A Sacred Birthday Tribute &bull; 2024
+          </span>
+          <Sparkles className="w-4 h-4 text-[#a65341]" />
         </div>
 
-        {/* Hero Title with Natural Tones Typography */}
-        <div className="mb-2">
-          <span className="uppercase tracking-[0.5em] text-[12px] font-sans-clean text-[#8e7d77] block mb-2 font-bold">
-            A Tribute to My Dearest
+        {/* Hero Title with Dignified Natural Tones Typography */}
+        <div className="mb-3">
+          <span className="uppercase tracking-[0.4em] text-[12px] sm:text-[13px] font-sans-clean text-[#8e7d77] block mb-2 font-bold">
+            Happy Birthday to My Beloved Wife
           </span>
-          <h1 className="font-serif-luxury text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-medium tracking-tight bg-gradient-to-b from-[#4a3a35] to-[#7c635b] bg-clip-text text-transparent leading-[0.95]">
+          
+          <h1 className="font-serif-luxury text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-medium tracking-tight text-[#4a3a35] leading-[1.05]">
             Jubaida Haque<br />
-            <span className="italic font-serif-luxury pl-8 sm:pl-16 text-5xl sm:text-7xl md:text-8xl lg:text-9xl text-[#a65341] drop-shadow-sm">
+            <span className="italic font-serif-luxury text-5xl sm:text-7xl md:text-8xl lg:text-9xl text-[#a65341] drop-shadow-sm inline-block mt-1">
               Jemi
             </span>
           </h1>
         </div>
 
         {/* Subtle Natural Tones Divider */}
-        <div className="max-w-[550px] h-[1px] bg-gradient-to-r from-transparent via-[#4a3a35]/30 to-transparent w-full my-3"></div>
+        <div className="max-w-[500px] h-[1px] bg-gradient-to-r from-transparent via-[#4a3a35]/30 to-transparent w-full my-3"></div>
 
-        <p className="font-sans-clean text-base sm:text-lg tracking-wide max-w-2xl leading-relaxed text-[#6d5a54]">
-          &ldquo;In the garden of my life, you are the most radiant blossom. Every heartbeat of mine carries your name. You are my light, my joy, and my entire world.&rdquo;
+        <p className="font-serif-luxury text-lg sm:text-2xl text-[#6d5a54] italic max-w-2xl leading-relaxed mx-auto">
+          &ldquo;You are the sweetest grace in my life. On your birthday, my soul celebrates the day you came into this world. Happy Birthday, my queen.&rdquo;
         </p>
 
-        {/* Natural Tones Devotion Emblems */}
-        <div className="mt-6 flex items-center gap-8 sm:gap-14 pointer-events-auto">
+        {/* Devotion Emblems */}
+        <div className="mt-6 flex items-center justify-center gap-8 sm:gap-14">
           <div className="flex flex-col items-center">
-            <span className="text-3xl sm:text-4xl font-light italic font-serif-luxury text-[#4a3a35]">Unlimited</span>
+            <span className="text-3xl sm:text-4xl font-light italic font-serif-luxury text-[#4a3a35]">Eternal</span>
             <span className="uppercase tracking-[0.25em] text-[9px] font-sans-clean font-black text-[#8e7d77]">Devotion</span>
           </div>
 
           <div 
-            onClick={handleHeartbeatClick}
-            className="w-14 h-14 rounded-full border border-[#4a3a35] flex items-center justify-center p-1.5 cursor-pointer hover:scale-110 active:scale-95 transition-transform bg-white/50 shadow-sm"
-            title="Send Heartbeat to Jemi"
+            onClick={handleNextAffirmation}
+            className="w-14 h-14 rounded-full border border-[#4a3a35]/30 flex items-center justify-center p-1.5 cursor-pointer hover:scale-110 active:scale-95 transition-transform bg-white shadow-sm"
+            title="Read Next Birthday Whisper"
           >
             <div className="w-full h-full rounded-full bg-[#4a3a35] flex items-center justify-center text-white shadow-inner">
-              <Heart className="w-5 h-5 fill-white text-white animate-pulse" />
+              <PartyPopper className="w-5 h-5 text-amber-300" />
             </div>
           </div>
 
@@ -99,38 +105,99 @@ export const GrandRevealHero: React.FC<GrandRevealHeroProps> = ({
           </div>
         </div>
 
-        {/* Dynamic Affirmation Pill */}
-        <div className="mt-4 px-5 py-1.5 rounded-full bg-white/70 border border-[#4a3a35]/15 text-[#7c635b] text-sm font-serif-luxury italic backdrop-blur-md shadow-sm pointer-events-auto">
-          {loveAffirmations[lastClickedQuote]}
+        {/* Dynamic Birthday Affirmation Pill */}
+        <div 
+          onClick={handleNextAffirmation}
+          className="mt-5 px-6 py-2.5 rounded-full bg-white/90 border border-[#4a3a35]/20 text-[#6d5a54] text-sm sm:text-base font-serif-luxury italic backdrop-blur-md shadow-sm hover:border-[#a65341] cursor-pointer transition-all hover:scale-[1.02]"
+        >
+          {birthdayAffirmations[lastClickedQuote]}
         </div>
       </div>
 
-      {/* Center Interactive 3D Heartbeat Callout */}
-      <div className="relative z-10 my-6 flex flex-col items-center text-center">
-        <button
-          id="hero-heartbeat-btn"
-          onClick={handleHeartbeatClick}
-          className="group relative flex items-center gap-3 px-6 py-3 rounded-full bg-[#4a3a35] hover:bg-[#382b27] border border-[#7c635b]/40 shadow-xl glow-terracotta text-white hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer"
-        >
-          <div className="relative">
-            <Heart className="w-5 h-5 text-[#fde2e4] fill-[#fde2e4] group-hover:scale-125 transition-transform duration-300" />
-            <span className="absolute inset-0 rounded-full bg-white/30 animate-ping" />
+      {/* Main Birthday Spotlight Card: Cake Cutting & Celebration Gateway */}
+      <div className="relative z-10 my-8 w-full max-w-2xl mx-auto p-6 sm:p-8 rounded-3xl bg-white/95 border-2 border-[#e8d7cf] shadow-xl backdrop-blur-xl flex flex-col sm:flex-row items-center justify-between gap-6 text-[#4a3a35]">
+        
+        {/* Left Side: Photo or Cake Icon */}
+        <div className="flex items-center gap-4">
+          {photoUrl ? (
+            <div className="w-20 h-24 sm:w-24 sm:h-28 rounded-2xl overflow-hidden border-2 border-[#a65341]/60 shadow-md flex-shrink-0 bg-neutral-100">
+              <img
+                src={photoUrl}
+                alt="Rahat and Jemi"
+                referrerPolicy="no-referrer"
+                className="w-full h-full object-cover"
+              />
+            </div>
+          ) : (
+            <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-[#f4e8e2] border border-[#d8c5bc] flex items-center justify-center flex-shrink-0">
+              <Cake className="w-10 h-10 text-[#a65341]" />
+            </div>
+          )}
+
+          <div className="text-left">
+            <div className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.2em] text-[#a65341] font-sans-clean">
+              <Sparkles className="w-3 h-3" />
+              <span>Special Feature</span>
+            </div>
+            <h3 className="font-serif-luxury text-xl sm:text-2xl font-bold text-[#4a3a35]">
+              Birthday Cake Cutting
+            </h3>
+            <p className="text-xs text-[#6d5a54] font-sans-clean mt-0.5 leading-relaxed">
+              Blow out golden sparkler candles, slice the royal cake with Rahat, and make a secret wish.
+            </p>
           </div>
-          <div className="flex flex-col text-left">
-            <span className="text-xs sm:text-sm font-bold tracking-wide font-sans-clean">Touch Our 3D Heart</span>
-            <span className="text-[10px] text-[#f7e1d7]">
-              {pulseCount === 0 ? 'Click or rotate 3D heart above' : `${pulseCount} Loving Heartbeats Sent ♥`}
-            </span>
-          </div>
-          <Flame className="w-4 h-4 text-[#e0a899] animate-pulse" />
-        </button>
+        </div>
+
+        {/* Right Side: Direct Action Button */}
+        <div className="flex flex-col w-full sm:w-auto gap-2">
+          <button
+            id="hero-cut-cake-btn"
+            onClick={handleCakeShortcut}
+            className="px-6 py-3.5 rounded-2xl bg-[#4a3a35] hover:bg-[#382b27] text-white font-bold text-sm shadow-lg hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer font-sans-clean whitespace-nowrap"
+          >
+            <Cake className="w-4 h-4 text-amber-300" />
+            <span>Cut Birthday Cake 🎂</span>
+          </button>
+
+          <button
+            onClick={() => {
+              audioEngine.playHappyBirthdayMelody();
+              launchGrandFireworks();
+            }}
+            className="px-4 py-2 rounded-xl bg-[#fffaf8] hover:bg-[#f4e8e2] border border-[#d8c5bc] text-xs font-semibold text-[#4a3a35] flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+          >
+            <Music className="w-3.5 h-3.5 text-[#a65341]" />
+            <span>Play Birthday Song 🎵</span>
+          </button>
+        </div>
+
       </div>
 
-      {/* Bottom Floating Interactive Exploration Deck */}
+      {/* Bottom Exploration Grid */}
       <div className="relative z-10 w-full max-w-6xl mx-auto">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3 sm:gap-4">
           
-          {/* Card 1: Rose for Jemi */}
+          {/* Card 1: Cake Cutting */}
+          <div
+            onClick={() => onNavigate('cake')}
+            id="explore-card-cake"
+            className="group p-4 rounded-2xl bg-[#fff7f4] hover:bg-white border-2 border-[#a65341]/40 hover:border-[#a65341] shadow-sm hover:shadow-md backdrop-blur-xl cursor-pointer transition-all duration-300 hover:-translate-y-1"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <div className="p-2.5 rounded-xl bg-[#a65341] text-white">
+                <Cake className="w-5 h-5" />
+              </div>
+              <ArrowRight className="w-4 h-4 text-[#8e7d77] group-hover:text-[#4a3a35] group-hover:translate-x-1 transition-all" />
+            </div>
+            <h2 className="text-base font-bold text-[#4a3a35] font-serif-luxury group-hover:text-[#a65341] transition-colors">
+              Cake Cutting 🎂
+            </h2>
+            <p className="text-xs text-[#6d5a54] mt-1 line-clamp-2 font-sans-clean leading-relaxed">
+              Blow candles &amp; slice your royal birthday confection.
+            </p>
+          </div>
+
+          {/* Card 2: Rose for Jemi */}
           <div
             onClick={() => onNavigate('rose')}
             id="explore-card-rose"
@@ -143,14 +210,14 @@ export const GrandRevealHero: React.FC<GrandRevealHeroProps> = ({
               <ArrowRight className="w-4 h-4 text-[#8e7d77] group-hover:text-[#4a3a35] group-hover:translate-x-1 transition-all" />
             </div>
             <h2 className="text-base font-bold text-[#4a3a35] font-serif-luxury group-hover:text-[#a65341] transition-colors">
-              Rose for Jemi 🌹
+              Rose Sanctuary 🌹
             </h2>
             <p className="text-xs text-[#6d5a54] mt-1 line-clamp-2 font-sans-clean leading-relaxed">
-              Offer blooming roses, pluck sweet whispers, and dedicate eternal rose wishes.
+              Offer blooming roses and whisper eternal rose wishes.
             </p>
           </div>
 
-          {/* Card 2: Love Letter */}
+          {/* Card 3: Love Letter */}
           <div
             onClick={() => onNavigate('letter')}
             id="explore-card-letter"
@@ -163,14 +230,14 @@ export const GrandRevealHero: React.FC<GrandRevealHeroProps> = ({
               <ArrowRight className="w-4 h-4 text-[#8e7d77] group-hover:text-[#4a3a35] group-hover:translate-x-1 transition-all" />
             </div>
             <h2 className="text-base font-bold text-[#4a3a35] font-serif-luxury group-hover:text-[#a65341] transition-colors">
-              My Love Letter
+              Birthday Letter 📜
             </h2>
             <p className="text-xs text-[#6d5a54] mt-1 line-clamp-2 font-sans-clean leading-relaxed">
-              Read Rahat&apos;s heartfelt written vows and love letter sealed exclusively for Jemi.
+              Heartfelt written vows sealed exclusively from Rahat.
             </p>
           </div>
 
-          {/* Card 3: Reasons Why */}
+          {/* Card 4: Reasons Why */}
           <div
             onClick={() => onNavigate('reasons')}
             id="explore-card-reasons"
@@ -186,11 +253,11 @@ export const GrandRevealHero: React.FC<GrandRevealHeroProps> = ({
               Why I Love You
             </h2>
             <p className="text-xs text-[#6d5a54] mt-1 line-clamp-2 font-sans-clean leading-relaxed">
-              Open glowing reasons and memories that make Jemi the most special person.
+              Glow jar with the reasons Jemi is Rahat&apos;s whole world.
             </p>
           </div>
 
-          {/* Card 4: Sacred Memories */}
+          {/* Card 5: Sacred Memories */}
           <div
             onClick={() => onNavigate('timeline')}
             id="explore-card-timeline"
@@ -206,27 +273,27 @@ export const GrandRevealHero: React.FC<GrandRevealHeroProps> = ({
               Sacred Memories
             </h2>
             <p className="text-xs text-[#6d5a54] mt-1 line-clamp-2 font-sans-clean leading-relaxed">
-              Our sacred milestones celebrating our infinite, timeless love story.
+              Timeless milestones celebrating our eternal love story.
             </p>
           </div>
 
-          {/* Card 5: Surprise Gift Box */}
+          {/* Card 6: Surprise Gift Box */}
           <div
             onClick={() => onNavigate('surprise')}
             id="explore-card-surprise"
-            className="group p-4 rounded-2xl bg-[#fff7f4] hover:bg-white border border-[#c97b6b]/30 hover:border-[#a65341] shadow-sm hover:shadow-md backdrop-blur-xl cursor-pointer transition-all duration-300 hover:-translate-y-1"
+            className="group p-4 rounded-2xl bg-white/80 hover:bg-white border border-[#c97b6b]/30 hover:border-[#a65341] shadow-sm hover:shadow-md backdrop-blur-xl cursor-pointer transition-all duration-300 hover:-translate-y-1"
           >
             <div className="flex items-center justify-between mb-2">
               <div className="p-2.5 rounded-xl bg-[#c97b6b]/20 text-[#8c4333] group-hover:bg-[#4a3a35] group-hover:text-white transition-colors">
-                <Gift className="w-5 h-5 animate-bounce" />
+                <Gift className="w-5 h-5" />
               </div>
               <ArrowRight className="w-4 h-4 text-[#8e7d77] group-hover:text-[#4a3a35] group-hover:translate-x-1 transition-all" />
             </div>
             <h2 className="text-base font-bold text-[#4a3a35] font-serif-luxury group-hover:text-[#a65341] transition-colors">
-              Surprise Gift
+              Surprise Gift 🎁
             </h2>
             <p className="text-xs text-[#6d5a54] mt-1 line-clamp-2 font-sans-clean leading-relaxed">
-              Unwrap the glowing surprise package prepared by Rahat!
+              Unwrap the secret gift package with your couple portrait!
             </p>
           </div>
 
@@ -249,7 +316,7 @@ export const GrandRevealHero: React.FC<GrandRevealHeroProps> = ({
             className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#4a3a35] hover:bg-[#382b27] border border-[#4a3a35] text-white text-xs sm:text-sm font-medium transition-all shadow-md cursor-pointer"
           >
             <Sparkles className="w-4 h-4 text-[#fde2e4]" />
-            <span className="font-sans-clean">Launch Celestial Fireworks 🎆</span>
+            <span className="font-sans-clean">Launch Birthday Fireworks 🎆</span>
           </button>
         </div>
       </div>

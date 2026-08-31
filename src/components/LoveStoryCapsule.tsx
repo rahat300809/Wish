@@ -1,17 +1,50 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { INITIAL_MILESTONES } from '../data/romanticContent';
 import { Milestone } from '../types';
-import { Sparkles, Heart, Plus, Calendar, Crown, HeartHandshake, Check, Flower2 } from 'lucide-react';
+import { Sparkles, Heart, Plus, Calendar, Crown, HeartHandshake, Check, Flower2, Image as ImageIcon } from 'lucide-react';
 import { audioEngine } from '../audio/RomanticAudioEngine';
 import { launchRoseShower } from '../utils/celebrationEffects';
+import { getSavedCouplePhoto, saveCouplePhoto } from '../utils/photoStorage';
 
 export const LoveStoryCapsule: React.FC = () => {
   const [milestones, setMilestones] = useState<Milestone[]>(INITIAL_MILESTONES);
+  const [photoUrl, setPhotoUrl] = useState<string | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
   const [newTitle, setNewTitle] = useState('');
   const [newDate, setNewDate] = useState('');
   const [newDesc, setNewDesc] = useState('');
   const [newTag, setNewTag] = useState('Memory');
+
+  useEffect(() => {
+    const saved = getSavedCouplePhoto();
+    if (saved) {
+      setPhotoUrl(saved);
+    }
+
+    const handlePhotoUpdated = () => {
+      setPhotoUrl(getSavedCouplePhoto());
+    };
+
+    window.addEventListener('couple_photo_updated', handlePhotoUpdated);
+    return () => {
+      window.removeEventListener('couple_photo_updated', handlePhotoUpdated);
+    };
+  }, []);
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const result = reader.result as string;
+        setPhotoUrl(result);
+        saveCouplePhoto(result);
+        audioEngine.playChime(1.3);
+        launchRoseShower();
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const handleAddMilestone = (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,11 +95,30 @@ export const LoveStoryCapsule: React.FC = () => {
         </p>
       </div>
 
-      {/* Devotional Eternal Journey Banner */}
+      {/* Devotional Eternal Journey Banner with Couple Photo */}
       <div className="w-full mb-12 p-6 sm:p-8 rounded-3xl bg-white/90 border border-[#e8d7cf] shadow-md backdrop-blur-xl flex flex-col items-center text-center text-[#4a3a35]">
-        <div className="w-12 h-12 rounded-full bg-[#f4e8e2] border border-[#d8c5bc] flex items-center justify-center mb-3 shadow-sm">
-          <Sparkles className="w-6 h-6 text-[#a65341]" />
-        </div>
+        
+        {photoUrl ? (
+          <div className="mb-6 p-2.5 bg-white rounded-2xl border border-[#d8c5bc] shadow-lg">
+            <div className="w-48 h-60 sm:w-56 sm:h-72 rounded-xl overflow-hidden border border-[#e8d7cf]">
+              <img
+                src={photoUrl}
+                alt="Rahat and Jemi"
+                referrerPolicy="no-referrer"
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <div className="pt-2 text-center">
+              <span className="font-serif-luxury italic text-xs sm:text-sm font-bold text-[#4a3a35]">
+                Rahat &amp; Jemi Forever ♥
+              </span>
+            </div>
+          </div>
+        ) : (
+          <div className="w-14 h-14 rounded-full bg-[#f4e8e2] border border-[#d8c5bc] flex items-center justify-center mb-3 shadow-sm">
+            <Sparkles className="w-6 h-6 text-[#a65341]" />
+          </div>
+        )}
         
         <h2 className="font-serif-luxury text-2xl sm:text-3xl font-medium text-[#4a3a35] mb-2">
           An Everlasting Bond Beyond Time
@@ -77,13 +129,21 @@ export const LoveStoryCapsule: React.FC = () => {
         </p>
 
         <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-          <span className="px-4 py-1.5 rounded-full bg-[#fffaf8] border border-[#d8c5bc] text-[#4a3a35] text-xs font-serif-luxury italic">
+          <label className="cursor-pointer inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#fffaf8] hover:bg-[#f4e8e2] border border-[#d8c5bc] text-[#4a3a35] text-xs font-semibold font-sans-clean transition-all shadow-sm">
+            <ImageIcon className="w-3.5 h-3.5 text-[#a65341]" />
+            <span>{photoUrl ? 'Change Our Photo' : 'Add Our Photo (IMG_5054.JPG)'}</span>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageUpload}
+              className="hidden"
+            />
+          </label>
+
+          <span className="px-4 py-2 rounded-full bg-[#fffaf8] border border-[#d8c5bc] text-[#4a3a35] text-xs font-serif-luxury italic">
             Forever Cherished
           </span>
-          <span className="px-4 py-1.5 rounded-full bg-[#fffaf8] border border-[#d8c5bc] text-[#4a3a35] text-xs font-serif-luxury italic">
-            Endlessly Beloved
-          </span>
-          <span className="px-4 py-1.5 rounded-full bg-[#fffaf8] border border-[#d8c5bc] text-[#a65341] text-xs font-serif-luxury italic font-bold">
+          <span className="px-4 py-2 rounded-full bg-[#fffaf8] border border-[#d8c5bc] text-[#a65341] text-xs font-serif-luxury italic font-bold">
             Rahat &hearts; Jemi
           </span>
         </div>
@@ -98,7 +158,7 @@ export const LoveStoryCapsule: React.FC = () => {
 
         <button
           onClick={() => setShowAddModal(!showAddModal)}
-          className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#4a3a35] hover:bg-[#382b27] text-white text-xs sm:text-sm font-bold shadow-md font-sans-clean"
+          className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#4a3a35] hover:bg-[#382b27] text-white text-xs sm:text-sm font-bold shadow-md font-sans-clean cursor-pointer"
         >
           <Plus className="w-4 h-4" />
           <span>{showAddModal ? 'Close Form' : 'Add Milestone'}</span>
@@ -165,7 +225,7 @@ export const LoveStoryCapsule: React.FC = () => {
 
             <button
               type="submit"
-              className="px-5 py-2 rounded-xl bg-[#4a3a35] hover:bg-[#382b27] text-white font-bold text-xs sm:text-sm flex items-center gap-1.5 shadow-md"
+              className="px-5 py-2 rounded-xl bg-[#4a3a35] hover:bg-[#382b27] text-white font-bold text-xs sm:text-sm flex items-center gap-1.5 shadow-md cursor-pointer"
             >
               <Check className="w-4 h-4" />
               <span>Save Memory</span>
