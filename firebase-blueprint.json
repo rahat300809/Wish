@@ -1,0 +1,41 @@
+{
+  "entities": {
+    "Milestone": {
+      "title": "Milestone",
+      "description": "Sacred milestones and memories for Rahat and Jemi",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "description": "Title of the memory" },
+        "date": { "type": "string", "description": "Date or period" },
+        "description": { "type": "string", "description": "Story of the memory" },
+        "tag": { "type": "string", "description": "Tag category" },
+        "icon": { "type": "string", "description": "Icon identifier" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "date", "description", "createdAt"]
+    },
+    "LoveReason": {
+      "title": "LoveReason",
+      "description": "Reasons why Rahat loves Jemi",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "description": "Title of reason" },
+        "content": { "type": "string", "description": "Content of reason" },
+        "category": { "type": "string", "enum": ["soul", "smile", "beauty", "kindness", "forever", "custom"] },
+        "favorite": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "content", "category", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/milestones/{milestoneId}": {
+      "schema": "Milestone",
+      "description": "Milestones collection"
+    },
+    "/loveReasons/{reasonId}": {
+      "schema": "LoveReason",
+      "description": "Love reasons collection"
+    }
+  }
+}
